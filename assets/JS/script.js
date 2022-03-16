@@ -1,5 +1,10 @@
 var startButton = document.querySelector(".startButton");
+var timerNode = document.querySelector("#timer")
 
+
+var isWin = false;
+var timer;
+var timerCount;
 
 var question1 = {
     question: "Which of the following is the assignment operator?",
@@ -41,6 +46,26 @@ var question5 = {
     choice4: "log()",
 };
 
+function startGame () {
+    isWin = false;
+    timerCount = 5;
+
+    startButton.disabled = true;
+    startTimer();
+};
+
+function startTimer() {
+    timer = setInterval(function(){
+    timerCount--;
+    timerNode.textContent = timerCount;
+    if (timerCount === 0) {
+        clearInterval(timer);
+
+    }
+    },1000);
+}
+
+startButton.addEventListener("click", startGame);
 
 // The init function is called when the page loads 
 function init() {
