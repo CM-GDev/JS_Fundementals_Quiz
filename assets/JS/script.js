@@ -13,13 +13,20 @@ var ansOptButton4 = document.createElement ("button");
 var chosenQustnObj = "";
 var chosenQustn = "";
 var chosenAns1 = "";
+var cA1true = "";
 var chosenAns2 = "";
+var cA2true = "";
 var chosenAns3 = "";
+var cA3true = "";
 var chosenAns4 = "";
+var cA4true = "";
+
+var buttonsArray=[];
+var buttonChosen;
 
 var winCounter = 0;
 var loseCounter = 0;
-var isWin = false;
+var GameOver = false;
 var timer;
 var timerCount;
 
@@ -52,7 +59,7 @@ var question4 = {
     question: "What does the '%' operator perform?",
     choice1: ["Returns the quotient between two numbers", "ful"],
     choice2: ["Returns the remainder between two number","full"],
-    choice3: ["Calculates the percentage of number", "ful"],
+    choice3: ["Used to calculate the percentage of number", "ful"],
     choice4: ["Used to make comments on a JS file", "ful"],
 };
 
@@ -79,7 +86,7 @@ var gameQuestions = [question1, question2, question3, question4, question5];
 
 // Function for initiating game questions and timer. Start of game
 function startGame () {
-    isWin = false;
+    GameOver = false;
     timerCount = 5;
     // Preventing start button from working while game is in progress
     startButton.disabled = true;
@@ -92,14 +99,22 @@ function startTimer() {
     timer = setInterval(function(){
     timerCount--;
     timerNode.textContent = timerCount;
-    if (timerCount === 0) {
-        clearInterval(timer);
+        if(timerCount >= 0) {
+            if (GameOver && timerCount>0) {
+                clearInterval(timer);
+                scoreBoard();
+            }
+        }
 
-    }
+        if (timerCount === 0) {
+            clearInterval(timer);
+            scoreBoard();
+
+        }
     },1000);
 }
 
-//Function for appending buttons for each question option. This goes in the .midPanel. 
+//Function rendering the game board. It appends buttons for each question option. This goes in the .midPanel. 
 function renderQuestBoard () {
     
     mainContNode.children[0].textContent = "";
@@ -111,33 +126,109 @@ function renderQuestBoard () {
     mainContNode.appendChild(ansOptButton3);
     mainContNode.appendChild(ansOptButton4);
 
-    mainContNode.setAttribute("style", "display: block");
+    mainContNode.setAttribute("style", "display: block; width: 100%; justify-content: center;");
 
-    mainContNode.children[1].setAttribute("style", "display: block; block-size: fit-content");
-    mainContNode.children[2].setAttribute("style", "display: block;");
-    mainContNode.children[3].setAttribute("style", "display: block;");
-    mainContNode.children[4].setAttribute("style", "display: block;");
+    feedbackNode.setAttribute("style", "border-top: 2px solid gray; font-style: italic")
+
+    mainContNode.children[1].setAttribute("style", "width: 100%; max-width: 700px; line-height: 90%");
+    mainContNode.children[2].setAttribute("style", "width: 100%; max-width: 700px; line-height: 90%");
+    mainContNode.children[3].setAttribute("style", "width: 100%; max-width: 700px; line-height: 90%");
+    mainContNode.children[4].setAttribute("style", "width: 100%; max-width: 700px; line-height: 90%");
     renderQuestions();
+    
 };
 
-// Function for populating questions and answer options.
+// Function for populating game board with random question and its answer options.
+
+
 function renderQuestions () {
-    chosenQustnObj = gameQuestions[Math.floor(Math.random() * gameQuestions.length)];
+    
+    let numbOfQuest = gameQuestions.length;
+    let questionsAsked = [];
+    let randomIndex = Math.floor(Math.random() * numbOfQuest);
+    for (i=0; i <= numbOfQuest; i++)
+        if (questionsAsked.includes(randomIndex) && numbOfQuest !== questionsAsked.length){
+        randomIndex = Math.floor(Math.random() * numbOfQuest);
+        } else {
+
+    
+    
+    chosenQustnObj = gameQuestions[randomIndex];
 
     chosenQustn = chosenQustnObj.question;
+
     chosenAns1 = chosenQustnObj.choice1[0];
     chosenAns2 = chosenQustnObj.choice2[0];
     chosenAns3 = chosenQustnObj.choice3[0];
     chosenAns4 = chosenQustnObj.choice4[0];
 
+    cA1true = chosenQustnObj.choice1[1];
+    cA2true = chosenQustnObj.choice2[1];
+    cA3true = chosenQustnObj.choice3[1];
+    cA4true = chosenQustnObj.choice4[1];
+
     mainContNode.children[0].textContent = chosenQustn;
     ansOptButton1.textContent = chosenAns1;
+    ansOptButton1.classList.add(cA1true);
     ansOptButton2.textContent = chosenAns2;
+    ansOptButton2.classList.add(cA2true);
     ansOptButton3.textContent = chosenAns3;
+    ansOptButton3.classList.add(cA3true);
     ansOptButton4.textContent = chosenAns4;
+    ansOptButton4.classList.add(cA4true);
+
+    buttonsArray = mainContNode.getElementsByTagName("button");
+  
+    mainContNode.addEventListener("click", checkButtnPicked)
+        }
+};  
+
+    // return buttonsArray;
+        function checkButtnPicked(event) {
+            var buttonChosen = event.target;
+            let i = 0;
+
+            if(buttonChosen.matches("button")){
+            
+                while(i < buttonsArray.length) {
+                    if(buttonChosen === buttonsArray[i]) {
+                        buttonChosen = buttonsArray[i];
+                    }
+                    i++;
+                    if(buttonChosen === buttonsArray[i]) {
+                        buttonChosen = buttonsArray[i];
+                    }
+                    i++;
+                    if(buttonChosen === buttonsArray[i]) {
+                        buttonChosen = buttonsArray[i];
+                    }
+                    i++;
+                    if(buttonChosen === buttonsArray[i]) {
+                        buttonChosen = buttonsArray[i];
+                    };
+                
+                }
+            } 
+        
+            let correctAns = buttonChosen.className;
+            console.log(correctAns);
+                if (correctAns == "ful") {
+                    feedbackNode.textContent = "Wrong";
+                } else {
+                    feedbackNode.textContent = "Correct!"
+                }
+
+        
+        }
 
 
 
-}
+
+
+
+
+
+
+
 
 startButton.addEventListener("click", startGame);
