@@ -13,6 +13,9 @@ var submitForm = document.createElement ("form");
 var formLabel = document.createElement("label");
 var formInput = document.createElement("input");
 var formBtn = document.createElement("button");
+var olScoresList = document.createElement("ol");
+var clearHistBtn = document.createElement("button");
+var goBackBtn = document.createElement("button");
 
 
 var chosenQustnObj = "";
@@ -27,6 +30,8 @@ var chosenAns4 = "";
 var cA4true = "";
 
 var buttonsArray=[];
+
+var highScoreInitials = [];
 
 var winCounter = 0;
 var GameOver = false;
@@ -80,12 +85,24 @@ var gameQuestions = [question1, question2, question3, question4, question5];
 
 
 // // The init function is called when the page loads 
-// function init() {
-//     getHighScores();
-//   }
+init();
 
-// // Calls init() so that it fires when page openes
-// init();
+function init() {
+
+    var savedScoresList = JSON.parse(localStorage.getItem("HighScoreInitials"));
+   
+    console.log(savedScoresList);
+    console.log(savedScoresList !== null);
+    
+
+    if (savedScoresList !== null) {
+       highScoreInitials = savedScoresList;
+    }
+console.log(highScoreInitials)    
+  }
+
+// Calls init() so that it fires when page openes
+
 
 // Function for initiating game questions and timer. Start of game
 function startGame () {
@@ -218,8 +235,6 @@ function checkButtnPicked(event) {
         if (checkAns == "ful") {
             feedbackNode.textContent = "Wrong";
             timerCount = timerCount-2;
-            // i++;
-            // setTimeout(function () {renderQuestBoard()},1000);
    
         } else {
             winCounter++;
@@ -228,7 +243,7 @@ function checkButtnPicked(event) {
             
             
         }
-    console.log(winCounter)
+    
     setTimeout(function () {renderQuestBoard()},500);
 
     } 
@@ -244,7 +259,7 @@ function scoreBoard() {
         }
 
     mainContNode.appendChild(midPanelpEl);
-    console.log(winCounter);
+    
 
     midPanelpEl.textContent = "Your Final Score is " + winCounter + " out of 5";
 
@@ -252,6 +267,9 @@ function scoreBoard() {
 }
 
 function submitInitials() {
+    
+    
+
     feedbackNode.appendChild(submitForm);
     feedbackNode.children[0].appendChild(formLabel);
     feedbackNode.children[0].appendChild(formInput);
@@ -262,26 +280,67 @@ function submitInitials() {
 
     formBtn.addEventListener("click", function(event) {
         event.preventDefault();
-        var inputInitials = document.querySelector("#initials").value;
+        var inputInitials = document.querySelector("#initials").value.trim();
 
-        console.log(inputInitials);
-        console.log(typeof(inputInitials));
 
         if (inputInitials === "") {
             return;
         } else {
+        
+        highScoreInitials.push(inputInitials);
 
-        localStorage.setItem("initials", inputInitials)
+        console.log(highScoreInitials)
+        
+        localStorage.setItem("HighScoreInitials", JSON.stringify(highScoreInitials));    
 
-        highScores ();    
+        highScores ();  
+        
         }
     })
 
-//     var submitForm = document.createElement ("form");
-// var formLabel = document.createElement("label");
-// var formInput = document.createElement("input");
-// var formBtn = document.createElement("button");
-}
+}    
+
+function highScores() {
+
+    highScoreInitials = JSON.parse(localStorage.getItem("HighScoreInitials"));
+    feedbackNode.textContent = " ";
+    mainContNode.children[0].textContent = "";
+    mainContNode.children[1].textContent = "";
+    mainContNode.children[0].textContent = "Saved Scores!"
+    mainContNode.appendChild(olScoresList);
+
+    feedbackNode.appendChild(goBackBtn);
+    feedbackNode.children[0].textContent = "Go Back"
+    feedbackNode.appendChild(clearHistBtn);
+    feedbackNode.children[1].textContent = "Clear History"
+
+    console.log(highScoreInitials.length)
+
+    for (i = 0; i < highScoreInitials.length; i++) {
+            
+        var highScoreInitials = highScoreInitials [i];
+
+            var li = document.createElement("li");
+            li.textContent = highScoreInitials + " Score of: " + winCounter
+            li.setAttribute("data-index", i);
+
+            olScoresList.appendChild(li);
+        }
+
+    goBackBtn.addEventListener("click", function (event) {
+
+        location.reload()
+    })
+
+    clearHistBtn.addEventListener("click", function (event) {
+
+
+        highScoreInitials = " "
+        olScoresList.textContent = " ";
+        localStorage.setItem("HighScoreInitials", JSON.stringify(highScoreInitials)); 
+    })
+    
+};
     
 
 
