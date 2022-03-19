@@ -8,6 +8,7 @@ var ansOptButton1 = document.createElement ("button");
 var ansOptButton2 = document.createElement ("button");
 var ansOptButton3 = document.createElement ("button");
 var ansOptButton4 = document.createElement ("button");
+var midPanelpEl = document.createElement ("p")
 
 
 var chosenQustnObj = "";
@@ -86,7 +87,7 @@ var gameQuestions = [question1, question2, question3, question4, question5];
 // Function for initiating game questions and timer. Start of game
 function startGame () {
     GameOver = false;
-    timerCount = 16;
+    timerCount = 15;
     // Preventing start button from working while game is in progress
     startButton.disabled = true;
     renderQuestBoard();
@@ -100,14 +101,16 @@ function startTimer() {
     timerNode.textContent = timerCount;
         if (timerCount >= 0) {
             if (GameOver && timerCount > 0) {
-                clearInterval(timer);
                 scoreBoard();
+                clearInterval(timer);
+                
             }
         }
 
-        if (timerCount === 0) {
-            clearInterval(timer);
+        if (timerCount <= 0) {
             scoreBoard();
+            clearInterval(timer);
+            
 
         }
     }, 1000);
@@ -144,13 +147,13 @@ var i = 0;
 var questIndex = "";
 let numbOfQuestns = gameQuestions.length;
 let initialRandIndex = Math.floor(Math.random() * numbOfQuestns);
-console.log(initialRandIndex);
+
 
 function renderQuestions () {
-   console.log(i)
+   
 
    questIndex = initialRandIndex + i
-   console.log(questIndex);
+   
 
     if (i === numbOfQuestns){
         GameOver = true;
@@ -163,9 +166,7 @@ function renderQuestions () {
     }
 
     //  else {
-        console.log(numbOfQuestns)        
-        console.log(questIndex);
-        console.log(typeof(questIndex)); 
+        
 
         chosenQustnObj = gameQuestions[questIndex];
 
@@ -182,6 +183,7 @@ function renderQuestions () {
         cA4true = chosenQustnObj.choice4[1];
 
         mainContNode.children[0].textContent = chosenQustn;
+
         ansOptButton1.textContent = chosenAns1;
         ansOptButton1.classList.add(cA1true);
         ansOptButton2.textContent = chosenAns2;
@@ -217,15 +219,34 @@ function checkButtnPicked(event) {
             // setTimeout(function () {renderQuestBoard()},1000);
    
         } else {
-            feedbackNode.textContent = "Correct!"
             winCounter++;
+            feedbackNode.textContent = "Correct!";
+            
             
         }
-    
+    console.log(winCounter)
     setTimeout(function () {renderQuestBoard()},1000);
 
     } 
+// Scoreboard
 
+function scoreBoard() {
+    feedbackNode.textContent = " ";
+    mainContNode.children[0].textContent = "";
+    mainContNode.children[0].textContent = "All Done!"
+
+        for (i = numbOfQuestns-1; i > 0; i--) {
+            mainContNode.removeChild(mainContNode.children[i]);
+        }
+
+    mainContNode.appendChild(midPanelpEl);
+    console.log(winCounter);
+
+    midPanelpEl.textContent = "Your Final Score is " + winCounter + " out of 5"
+    
+
+    
+}
 
 
 
