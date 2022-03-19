@@ -8,7 +8,11 @@ var ansOptButton1 = document.createElement ("button");
 var ansOptButton2 = document.createElement ("button");
 var ansOptButton3 = document.createElement ("button");
 var ansOptButton4 = document.createElement ("button");
-var midPanelpEl = document.createElement ("p")
+var midPanelpEl = document.createElement ("p");
+var submitForm = document.createElement ("form");
+var formLabel = document.createElement("label");
+var formInput = document.createElement("input");
+var formBtn = document.createElement("button");
 
 
 var chosenQustnObj = "";
@@ -77,8 +81,7 @@ var gameQuestions = [question1, question2, question3, question4, question5];
 
 // // The init function is called when the page loads 
 // function init() {
-//     getWins();
-//     getlosses();
+//     getHighScores();
 //   }
 
 // // Calls init() so that it fires when page openes
@@ -214,18 +217,19 @@ function checkButtnPicked(event) {
     
         if (checkAns == "ful") {
             feedbackNode.textContent = "Wrong";
-            timerCount = timerCount-3;
+            timerCount = timerCount-2;
             // i++;
             // setTimeout(function () {renderQuestBoard()},1000);
    
         } else {
             winCounter++;
+            
             feedbackNode.textContent = "Correct!";
             
             
         }
     console.log(winCounter)
-    setTimeout(function () {renderQuestBoard()},1000);
+    setTimeout(function () {renderQuestBoard()},500);
 
     } 
 // Scoreboard
@@ -242,11 +246,44 @@ function scoreBoard() {
     mainContNode.appendChild(midPanelpEl);
     console.log(winCounter);
 
-    midPanelpEl.textContent = "Your Final Score is " + winCounter + " out of 5"
+    midPanelpEl.textContent = "Your Final Score is " + winCounter + " out of 5";
+
+    submitInitials();
+}
+
+function submitInitials() {
+    feedbackNode.appendChild(submitForm);
+    feedbackNode.children[0].appendChild(formLabel);
+    feedbackNode.children[0].appendChild(formInput);
+    feedbackNode.children[0].appendChild(formBtn);
+    feedbackNode.children[0].children[0].textContent = "Enter your initials  "
+    feedbackNode.children[0].children[1].setAttribute("id","initials")
+    feedbackNode.children[0].children[2].textContent = "Submit"
+
+    formBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+        var inputInitials = document.querySelector("#initials").value;
+
+        console.log(inputInitials);
+        console.log(typeof(inputInitials));
+
+        if (inputInitials === "") {
+            return;
+        } else {
+
+        localStorage.setItem("initials", inputInitials)
+
+        highScores ();    
+        }
+    })
+
+//     var submitForm = document.createElement ("form");
+// var formLabel = document.createElement("label");
+// var formInput = document.createElement("input");
+// var formBtn = document.createElement("button");
+}
     
 
-    
-}
 
 
 
