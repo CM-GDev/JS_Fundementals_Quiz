@@ -1,9 +1,11 @@
+// Creating variables for main querySelectors
 var startButton = document.querySelector(".startButton");
 var timerNode = document.querySelector("#timer");
 var mainContNode = document.querySelector("#mainContent");
-var feedbackNode = document.querySelector("#feedback")
+var feedbackNode = document.querySelector("#feedback");
+var viewHighscoresNode = document.querySelector("#viewHighScore");
 
-// Creating button elements in DOM
+// Creating elements in DOM
 var ansOptButton1 = document.createElement ("button");
 var ansOptButton2 = document.createElement ("button");
 var ansOptButton3 = document.createElement ("button");
@@ -17,7 +19,7 @@ var olScoresList = document.createElement("ol");
 var clearHistBtn = document.createElement("button");
 var goBackBtn = document.createElement("button");
 
-
+// Initiating global variables
 var chosenQustnObj = "";
 var chosenQustn = "";
 var chosenAns1 = "";
@@ -28,11 +30,8 @@ var chosenAns3 = "";
 var cA3true = "";
 var chosenAns4 = "";
 var cA4true = "";
-
 var buttonsArray=[];
-
 var highScoreInitials = [];
-
 var winCounter = 0;
 var GameOver = false;
 var timer;
@@ -80,34 +79,24 @@ var question5 = {
 };
 
 // All questions stored into an array for easier access
-
 var gameQuestions = [question1, question2, question3, question4, question5];
 
 
-// // The init function is called when the page loads 
+// // The init function is called when the page loads. It collects initials w/ their high score from local storage 
 init();
 
 function init() {
-
     var savedScoresList = JSON.parse(localStorage.getItem("HighScoreInitials"));
    
-    console.log(savedScoresList);
-    console.log(savedScoresList !== null);
-    
-
-    if (savedScoresList !== null) {
-       highScoreInitials = savedScoresList;
-    }
-console.log(highScoreInitials)    
+        if (savedScoresList !== null) {
+        highScoreInitials = savedScoresList;
+        }    
   }
-
-// Calls init() so that it fires when page openes
-
 
 // Function for initiating game questions and timer. Start of game
 function startGame () {
     GameOver = false;
-    timerCount = 15;
+    timerCount = 25;
     // Preventing start button from working while game is in progress
     startButton.disabled = true;
     renderQuestBoard();
@@ -119,37 +108,34 @@ function startTimer() {
     timer = setInterval(function(){
     timerCount--;
     timerNode.textContent = timerCount;
+    // If player answers all question before timer expires, game ends and are sent to the scoreboard page
         if (timerCount >= 0) {
             if (GameOver && timerCount > 0) {
                 scoreBoard();
                 clearInterval(timer);
-                
             }
         }
-
+    // If timer exprires, game ends and are sent to the scoreboard page
         if (timerCount <= 0) {
             scoreBoard();
             clearInterval(timer);
-            
-
         }
     }, 1000);
 }
 
 //Function for rendering the game board. It appends buttons for each question option. This goes in the .midPanel. 
-
-
 function renderQuestBoard () {
     // Clear the page
     mainContNode.children[0].textContent = "";
     feedbackNode.textContent = " ";
     
-    
+    // append the buttoms for possible answers to go inside
     mainContNode.appendChild(ansOptButton1);
     mainContNode.appendChild(ansOptButton2);
     mainContNode.appendChild(ansOptButton3);
     mainContNode.appendChild(ansOptButton4);
 
+    // Setting Styles for game board
     mainContNode.setAttribute("style", "display: block; width: 100%; justify-content: center;");
 
     feedbackNode.setAttribute("style", "border-top: 2px solid gray; font-style: italic")
@@ -162,32 +148,27 @@ function renderQuestBoard () {
     
 };
 
-// Function for populating game board with random question and corresponding answer options. Also has checks if all questions have been answered.
+// Establishing variables that will assist with rendering the questions. They are placed close to the function for easier viewing access
 var i = 0;
 var questIndex = "";
 let numbOfQuestns = gameQuestions.length;
 let initialRandIndex = Math.floor(Math.random() * numbOfQuestns);
 
-
+// Function for populating game board with random question and corresponding answer options. Also has checks if all questions have been answered.
 function renderQuestions () {
-   
-
+    // first question is randomly picked
    questIndex = initialRandIndex + i
    
+        // If all 5 questions have been answered, game ends
+        if (i === numbOfQuestns){
+            GameOver = true;
+        } 
+        // This if statement returns gameplay back to index = 0 of gameQuestions if all answers have not been answered and time has not expired
+        if (questIndex >= numbOfQuestns){
+            questIndex = questIndex - numbOfQuestns;
+        }
 
-    if (i === numbOfQuestns){
-        GameOver = true;
-        // scoreBoard();
-    } 
-
-    if (questIndex >= numbOfQuestns){
-        // questIndex = 0;
-        questIndex = questIndex - numbOfQuestns;
-    }
-
-    //  else {
-        
-
+        // game board content (question and answers) are populated
         chosenQustnObj = gameQuestions[questIndex];
 
         chosenQustn = chosenQustnObj.question;
@@ -214,138 +195,124 @@ function renderQuestions () {
         ansOptButton4.classList.add(cA4true);
 
         buttonsArray = mainContNode.getElementsByTagName("button");
-
+        // Set a "click" event listener to all possible answers
             for (j = 0; j < buttonsArray.length; j++){
-                buttonsArray[j].addEventListener("click", checkButtnPicked)
-                                   
+                // call checkButtnPicked function on "click"
+                buttonsArray[j].addEventListener("click", checkButtnPicked);                
             }
-        i++
-    // };
+        i++   
 };
     
  
 
-// return buttonsArray;
+// Fucntion for varifying correct answer
 function checkButtnPicked(event) {
    
    var buttonChosen = event.target;
 
    let checkAns = buttonChosen.className;
-    
+    // If clicked answer is incorrect, "Wrong" text will appear
         if (checkAns == "ful") {
             feedbackNode.textContent = "Wrong";
             timerCount = timerCount-2;
-   
+    // If clicked answer is correct, "Correct!" text will appear and adds +1 to win counter    
         } else {
             winCounter++;
-            
-            feedbackNode.textContent = "Correct!";
-            
-            
+            feedbackNode.textContent = "Correct!"; 
         }
-    
+    // Setting a .5 second delay before calling the next question. (pseudo for loop) 
     setTimeout(function () {renderQuestBoard()},500);
+} 
 
-    } 
-// Scoreboard
-
+// Function for showing final score
 function scoreBoard() {
+    //Fist, game board has to be cleared 
     feedbackNode.textContent = " ";
     mainContNode.children[0].textContent = "";
     mainContNode.children[0].textContent = "All Done!"
-
+    // Removing buttons
         for (i = numbOfQuestns-1; i > 0; i--) {
             mainContNode.removeChild(mainContNode.children[i]);
         }
 
     mainContNode.appendChild(midPanelpEl);
     
-
+    // Displaying final score
     midPanelpEl.textContent = "Your Final Score is " + winCounter + " out of 5";
 
+    // Call function for submitting scores and initials
     submitInitials();
 }
 
 function submitInitials() {
     
-    
-
+    // Generate a form with input box and submit button
     feedbackNode.appendChild(submitForm);
     feedbackNode.children[0].appendChild(formLabel);
     feedbackNode.children[0].appendChild(formInput);
     feedbackNode.children[0].appendChild(formBtn);
-    feedbackNode.children[0].children[0].textContent = "Enter your initials  "
+    feedbackNode.children[0].children[0].textContent = "Enter your initials and score  "
     feedbackNode.children[0].children[1].setAttribute("id","initials")
     feedbackNode.children[0].children[2].textContent = "Submit"
 
+    // Code for collecting submitted information
     formBtn.addEventListener("click", function(event) {
         event.preventDefault();
         var inputInitials = document.querySelector("#initials").value.trim();
 
-
-        if (inputInitials === "") {
-            return;
-        } else {
+            if (inputInitials =="") {
+                return;
+            } else {
         
+        // .push submitted info into highScoreInitials, which will be saved to local storage
         highScoreInitials.push(inputInitials);
-
-        console.log(highScoreInitials)
         
         localStorage.setItem("HighScoreInitials", JSON.stringify(highScoreInitials));    
 
         highScores ();  
-        
         }
-    })
-
+    });
 }    
 
+// Function for viewing stored high scores
 function highScores() {
-
+// clear window before populating high score list
     highScoreInitials = JSON.parse(localStorage.getItem("HighScoreInitials"));
     feedbackNode.textContent = " ";
     mainContNode.children[0].textContent = "";
-    mainContNode.children[1].textContent = "";
     mainContNode.children[0].textContent = "Saved Scores!"
     mainContNode.appendChild(olScoresList);
 
+    // Creating buttons for "restarting game" and "clearing history"
     feedbackNode.appendChild(goBackBtn);
     feedbackNode.children[0].textContent = "Go Back"
     feedbackNode.appendChild(clearHistBtn);
     feedbackNode.children[1].textContent = "Clear History"
 
-    console.log(highScoreInitials.length)
-
-    for (i = 0; i < highScoreInitials.length; i++) {
-            
-        var highScoreInitials = highScoreInitials [i];
-
+// creating list of scores stored
+        for (i = 0; i < highScoreInitials.length; i++) {
+                
+            var highScoreInitials = highScoreInitials[i];
             var li = document.createElement("li");
             li.textContent = highScoreInitials + " Score of: " + winCounter
             li.setAttribute("data-index", i);
-
             olScoresList.appendChild(li);
         }
-
+// code for button to reload game
     goBackBtn.addEventListener("click", function (event) {
-
         location.reload()
     })
-
+// code for button to clear history
     clearHistBtn.addEventListener("click", function (event) {
-
-
         highScoreInitials = " "
         olScoresList.textContent = " ";
         localStorage.setItem("HighScoreInitials", JSON.stringify(highScoreInitials)); 
     })
     
 };
-    
 
+// Add "click" event listener to "View Highscores" link on top left of page 
+viewHighscoresNode.addEventListener("click", highScores);
 
-
-
-
-
+// Add "click" event listener to "Start Quiz" button
 startButton.addEventListener("click", startGame);
